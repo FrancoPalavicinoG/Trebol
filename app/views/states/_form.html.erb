@@ -1,0 +1,17 @@
+<%= form_with model: [state.board, state], local: true do |form| %>
+    <div class="card white-font mt-4" style="width: auto;">
+        <div class="card-body">
+            <%= form.hidden_field :board_id, value: state.board_id %>
+            <%= form.hidden_field :board_position, value: 1 %>
+            <div class="d-flex justify-content-between align-items-center">
+                <%= form.text_field :status, placeholder: "Status", class: "form-control mb-4", required: true %>
+            </div> 
+            <div class="actions d-flex justify-content-center align-items-center gap-2">
+                <%= form.submit "Submit", class: "btn btn-primary custom-button mb-4" %>
+                <%= link_to board_path(state.board), class: "btn btn-primary custom-button mb-4" do %>
+                    <i class="bi bi-arrow-90deg-left"></i>
+                <% end %>
+            </div>
+        </div>
+    </div>
+<% end %>

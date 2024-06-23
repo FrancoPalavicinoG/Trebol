@@ -1,0 +1,42 @@
+<h1 class="h1-text">Your Boards</h1>
+<div class="row">
+    <div class="col">
+        <div class="scrolling-wrapper">
+            <table class="table custom-table">
+            <thead>
+                <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Creator</th>
+                <th scope="col">Published At</th>
+                <th scope="col">View</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @boards.each do |board| %>
+                <tr>
+                    <th scope="row"><%= board.id %></th>
+                    <td><%= board.name %></td>
+                    <td><%= board.creator.name %></td>
+                    <td><%= board.published_at.strftime("%d/%m/%Y") %></td>
+                    <td>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary custom-button" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-three-dots"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="<%= board_path(board) %>">View</a></li>
+                            <li><a class="dropdown-item" href="<%= edit_board_path(board) %>">Edit</a></li>
+                            <li>
+                                <%= link_to 'Delete', board_path(board), data: { turbo_confirm: 'Are you sure?', turbo_method: "delete" }, class: "dropdown-item" %>
+                            </li>
+                        </ul>
+                    </div>
+                    </td>
+                </tr>
+                <% end %>
+            </tbody>
+            </table>
+        </div>
+    </div>
+</div>

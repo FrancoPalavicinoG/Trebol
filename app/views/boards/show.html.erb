@@ -1,0 +1,125 @@
+<div class="header-container d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+        <h1 class="h1-text"><%= @board.name %></h1>
+        <%= link_to boards_path, class: "card-link icon-return" do %>
+            <i class="bi bi-arrow-return-left icon-color"></i>
+        <% end %>
+    </div>
+    <div class="btn-group">
+        <%= link_to new_board_label_path(@board), class: "btn btn-primary d-flex align-items-center custom-button" do %>
+          Create Label <i class="bi bi-bookmark ms-2"></i>
+        <% end %>
+        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split custom-button" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="visually-hidden">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="<%= board_labels_path(@board) %>">All Labels</a></li>
+        </ul>
+    </div>
+</div>
+<div class="container text-center mt-4">
+    <div class="board-container">
+        <% @states.each do |state| %>
+            <div class="col-12 col-md-3 mb-4 custom-column">
+                <div class="state-header">
+                    <h5 class="show-text"><%= state.status %></h5>
+                    <div class="dropdown">
+                        <button class="btn text-white fs-4" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="<%= edit_board_state_path(@board, state) %>">Edit</a></li>
+                            <li>
+                                <%= link_to 'Delete', board_state_path(@board, state), data: { turbo_confirm: 'Are you sure?', turbo_method: "delete" }, class: "dropdown-item" %>
+                            </li>
+                        </ul>
+                    </div>
+                </div>                
+                <% state.tasks.each do |task| %>
+                    <div class="task-box">
+                        <% if task.label %>
+                            <div class="label-strip" style="background-color: <%= task.label.color %>;"></div>
+                        <% end %>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3 class="task-title mb-0"><%= task.title %></h3>
+                            <div class="dropdown">
+                                <button class="btn text-white fs-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-three-dots"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="<%= board_state_task_path(@board, state, task) %>">View</a></li>
+                                    <li><a class="dropdown-item" href="<%= edit_board_state_task_path(@board, state, task) %>">Edit</a></li>
+                                    <li>
+                                        <%= link_to 'Delete', board_state_task_path(@board, state, task), data: { turbo_confirm: 'Are you sure?', turbo_method: "delete" }, class: "dropdown-item" %>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="select"> 
+                            <select class="form-select task-state-selector mb-3 text-white" style="background-color: #293250" data-task-id="<%= task.id %>">
+                                <% @board.states.each do |state| %>
+                                <option value="<%= state.id %>" <%= "selected" if task.state_id == state.id %>> <%= state.status %> </option>
+                                <% end %>
+                            </select> 
+                        </div>
+
+                        <% if task.assignee %>
+                            <p class="task-assig">Assigned to <%= task.assignee.name %></p>
+                        <% else %>
+                            <p class="task-assig">No assignee</p>
+                        <% end %>
+                        <p class="task-desc"><%= task.description %></p>
+
+                        <div class="attachments">
+                            <i class="bi bi-paperclip"><%= task.attachments.count %></i>
+                        </div>   
+
+                    </div>
+                <% end %>
+
+                <%= link_to new_board_state_task_path(@board, state), class: "btn btn-primary custom-button-2" do %>
+                    <i class="bi bi-plus-lg"></i> Add a card
+                <% end %>
+            </div>
+        <% end %>
+
+        <div class="col-12 col-md-3 mb-4 custom-column">
+            <div class="state-header">
+                <%= link_to new_board_state_path(@board), class: "btn btn-primary custom-button-2 fs-6" do %>
+                    <i class="bi bi-plus-lg"></i> Add a column
+                <% end %>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const taskStateSelectors = document.querySelectorAll(".task-state-selector");
+
+    taskStateSelectors.forEach(selector => {
+        selector.addEventListener("change", function(event) {
+            const taskId = event.target.dataset.taskId;
+            const newStateId = event.target.value;
+            const boardId = document.body.dataset.boardId;
+
+            fetch(`/boards/${boardId}/states/${newStateId}/tasks/${taskId}`, {
+                method: 'PATCH',
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": "<%= form_authenticity_token %>"
+                },
+                body: JSON.stringify({ state_id: newStateId })
+            })
+            .then(response => {
+                if (response.ok) {
+                } else {
+                    window.location.reload();
+                }
+            window.location.reload();
+            }); 
+        });
+    });
+</script>
