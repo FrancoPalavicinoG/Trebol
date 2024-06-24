@@ -50,7 +50,7 @@ class LabelsController < ApplicationController
 
     private
 
-    def set_labels
+    def set_label
       @label = Label.find_by(id: params[:id])
       if @label
         @board = @label.board
